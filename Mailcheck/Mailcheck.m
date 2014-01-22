@@ -20,6 +20,10 @@ static int threshold;
     threshold = 3;
 }
 
++(void)setThreshold:(int)t {
+  threshold = t;
+}
+
 +(NSDictionary *)suggest:(NSString *)email {
     return [self suggest:email domains:defaultDomains topLevelDomains:defaultTopLevelDomains];
 }

@@ -10,6 +10,7 @@
 
 @interface Mailcheck : NSObject
 
++(void)setThreshold:(int)t;
 +(NSDictionary *)suggest:(NSString *)email;
 +(NSDictionary *)suggest:(NSString *)email domains:(NSArray *)domains topLevelDomains:(NSArray *)topLevelDomains;
 
