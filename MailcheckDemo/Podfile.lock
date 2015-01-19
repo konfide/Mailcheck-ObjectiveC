@@ -1,0 +1,10 @@
+PODS:
+  - NSString-Email (0.0.2)
+
+DEPENDENCIES:
+  - NSString-Email
+
+SPEC CHECKSUMS:
+  NSString-Email: 5bd2c7e59fb9705f75aeae541882b8d47a212f2e
+
+COCOAPODS: 0.33.1

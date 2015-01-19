@@ -7,11 +7,12 @@
 //
 
 #import "Mailcheck.h"
+#import <NSString-Email/NSString+Email.h>
 
 @implementation Mailcheck
 
 static NSArray *defaultDomains, *defaultTopLevelDomains;
-static int threshold;
+static NSInteger threshold;
 
 +(void)initialize {
     defaultDomains = @[@"yahoo.com", @"google.com", @"hotmail.com", @"gmail.com", @"me.com", @"aol.com", @"mac.com", @"live.com", @"comcast.net", @"googlemail.com", @"msn.com", @"hotmail.co.uk", @"yahoo.co.uk", @"facebook.com", @"verizon.net", @"sbcglobal.net", @"att.net", @"gmx.com", @"mail.com"];
@@ -24,8 +25,28 @@ static int threshold;
   threshold = t;
 }
 
++(NSDictionary *)check:(NSString *)email {
+    return [self check:email domains:defaultDomains topLevelDomains:defaultTopLevelDomains];
+}
+
++(NSDictionary *)check:(NSString *)email extraDomains:(NSArray *)domains extraTopLevelDomains:(NSArray *)topLevelDomains {
+    return [self check:email domains:[defaultDomains arrayByAddingObjectsFromArray:domains] topLevelDomains:[defaultTopLevelDomains arrayByAddingObjectsFromArray:topLevelDomains]];
+}
+
++(NSDictionary *)check:(NSString *)email domains:(NSArray *)domains topLevelDomains:(NSArray *)topLevelDomains {
+    NSDictionary *suggestion = [self suggest:email domains:domains topLevelDomains:topLevelDomains];
+    if(suggestion) {
+        return @{@"valid": @([email isEmail]), @"suggestion": suggestion};
+    }
+    return @{@"valid": @([email isEmail])};
+}
+
 +(NSDictionary *)suggest:(NSString *)email {
     return [self suggest:email domains:defaultDomains topLevelDomains:defaultTopLevelDomains];
+}
+
++(NSDictionary *)suggest:(NSString *)email extraDomains:(NSArray *)domains extraTopLevelDomains:(NSArray *)topLevelDomains {
+    return [self suggest:email domains:[defaultDomains arrayByAddingObjectsFromArray:domains] topLevelDomains:[defaultTopLevelDomains arrayByAddingObjectsFromArray:topLevelDomains]];
 }
 
 +(NSDictionary *)suggest:(NSString *)email domains:(NSArray *)domains topLevelDomains:(NSArray *)topLevelDomains {
@@ -51,8 +72,8 @@ static int threshold;
 }
 
 +(NSString *)findClosestDomain:(NSString *)domain domains:(NSArray *)domains {
-    int dist;
-    int minDist = 99;
+    NSInteger dist;
+    NSInteger minDist = 99;
     NSString *closestDomain = nil;
     
     if (!domain || !domains) {
@@ -77,7 +98,7 @@ static int threshold;
     }
 }
 
-+(int)sift3Distance:(NSString *)s1 :(NSString *)s2 {
++(NSInteger)sift3Distance:(NSString *)s1 :(NSString *)s2 {
     // sift3: http://siderite.blogspot.com/2007/04/super-fast-and-accurate-string-distance.html
     if (!s1 || [s1 length] == 0) {
         if (!s2 || [s2 length] == 0) {
@@ -91,11 +112,11 @@ static int threshold;
         return [s1 length];
     }
     
-    int c = 0;
-    int offset1 = 0;
-    int offset2 = 0;
-    int lcs = 0;
-    int maxOffset = 5;
+    NSInteger c = 0;
+    NSInteger offset1 = 0;
+    NSInteger offset2 = 0;
+    NSInteger lcs = 0;
+    NSInteger maxOffset = 5;
     
     while ((c + offset1 < [s1 length]) && (c + offset2 < [s2 length])) {
         if ([s1 characterAtIndex:c+offset1] == [s2 characterAtIndex:c + offset2]) {
@@ -103,7 +124,7 @@ static int threshold;
         } else {
             offset1 = 0;
             offset2 = 0;
-            for (int i = 0; i < maxOffset; i++) {
+            for (NSInteger i = 0; i < maxOffset; i++) {
                 if ((c + i < [s1 length]) && ([s1 characterAtIndex:(c + i)] == [s2 characterAtIndex:c])) {
                     offset1 = i;
                     break;
@@ -126,7 +147,7 @@ static int threshold;
         return nil;
     }
     
-    for (int i = 0; i < [parts count]; i++) {
+    for (NSInteger i = 0; i < [parts count]; i++) {
         if ([parts[i] isEqualToString:@""]) {
             return nil;
         }
@@ -145,7 +166,7 @@ static int threshold;
         tld = domainParts[0];
     } else {
         // The address has a domain and a top-level domain
-        for (int i = 1; i < [domainParts count]; i++) {
+        for (NSInteger i = 1; i < [domainParts count]; i++) {
             tld = [tld stringByAppendingFormat:@"%@.",domainParts[i]];
         }
         if ([domainParts count] >= 2) {
